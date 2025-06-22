@@ -58,9 +58,9 @@
       </div>
 
       <div class="footer-links">
-        <a href="#">Forgot password?</a>
+        <router-link to="#" class="text-blue-500 hover:underline">Forgot password?</router-link>
         <span>•</span>
-        <a href="#">Sign up</a>
+        <router-link to="/register" class="text-blue-500 hover:underline">Sign up</router-link>
       </div>
     </div>
   </div>
