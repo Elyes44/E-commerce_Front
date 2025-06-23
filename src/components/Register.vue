@@ -134,13 +134,29 @@
               <span v-else>Create Account</span>
             </button>
             
-            <span style="color: black;">have an account?</span> <a href="/login" class="link">Sign In</a>
+            <div class="login-prompt">
+              <span>Have an account?</span> <a href="/login" class="link">Sign In</a>
+            </div>
 
             <div v-if="errors.server" class="server-error">
               {{ errors.server }}
             </div>
           </form>
         </div>
+      </div>
+    </div>
+
+    <!-- Success Popup -->
+    <div v-if="showSuccessPopup" class="success-popup-overlay" @click.self="showSuccessPopup = false">
+      <div class="success-popup">
+        <div class="success-animation">
+          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+        <p class="success-message">Registration successful!</p>
+        <a href="/login" class="login-button">Sign In</a>
       </div>
     </div>
   </div>
@@ -162,6 +178,7 @@ const formData = ref({
 
 const errors = ref({});
 const isLoading = ref(false);
+const showSuccessPopup = ref(false);
 const router = useRouter();
 
 const FIELD_LIMITS = {
@@ -304,8 +321,8 @@ const handleSubmit = async () => {
       throw new Error(data.error || data.errors || 'Registration failed');
     }
 
-    localStorage.setItem('token', data.token);
-    router.push('/dashboard');
+    // Show success popup
+    showSuccessPopup.value = true;
 
   } catch (error) {
     errors.value.server = error.message;
@@ -506,6 +523,127 @@ html, body {
 .sign-up-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.login-prompt {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.login-prompt span {
+  color: #4a5568;
+}
+
+.link {
+  color: #2b6cb0;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Success Popup Styles */
+.success-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.success-popup {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.success-animation {
+  margin-bottom: 1.5rem;
+}
+
+.checkmark {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #4bb71b;
+  stroke-miterlimit: 10;
+  margin: 0 auto;
+  animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #4bb71b;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+.success-message {
+  font-size: 1.25rem;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+}
+
+.login-button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #2b6cb0;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+  background-color: #2c5282;
+}
+
+/* Animations */
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0 0 0 100px rgba(75, 183, 27, 0);
+  }
 }
 
 /* Responsive Design */
