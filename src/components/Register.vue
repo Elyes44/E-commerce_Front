@@ -1,81 +1,147 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center">
-    <div class="form-container">
-      <h2 class="form-title">Sign Up</h2>
-
-      <div v-if="errors.server" class="error-message">
-        {{ errors.server }}
+  <div class="registration-page">
+    <div class="registration-container">
+      <!-- Left Side: Welcome Content -->
+      <div class="welcome-section">
+        <div class="welcome-content">
+          <h1 class="welcome-title">Welcome to Our Platform</h1>
+          <div class="welcome-text">
+            <p>Join our growing community of users who are transforming the way they work and connect.</p>
+            
+            <p>When you register, you'll get access to:</p>
+            <ul class="benefits-list">
+              <li>Personalized dashboard tailored to your needs</li>
+              <li>Secure cloud storage for your documents</li>
+              <li>Priority customer support 24/7</li>
+              <li>Exclusive member-only features</li>
+            </ul>
+            
+            <p>Our platform is designed with simplicity and efficiency in mind, helping you achieve more with less effort.</p>
+            
+            <p class="call-to-action">Sign up now and take the first step toward a more productive future!</p>
+          </div>
+        </div>
       </div>
 
-      <form @submit.prevent="handleSubmit" novalidate>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input v-model="formData.email" type="email" id="email"
-              :class="{ 'error-border': errors.email && formData.email === '' }"
-              placeholder="Enter your email address" @blur="validateField('email')" @input="clearError('email')" />
-            <p v-if="errors.email" class="error-text">{{ errors.email }}</p>
-          </div>
-          <div class="form-group">
-            <label for="displayName">Full Name</label>
-            <input v-model="formData.displayName" type="text" id="displayName"
-              :class="{ 'error-border': errors.displayName && formData.displayName === '' }"
-              placeholder="Enter your full name" @blur="validateField('displayName')" @input="clearError('displayName')" />
-            <p v-if="errors.displayName" class="error-text">{{ errors.displayName }}</p>
-          </div>
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input v-model="formData.phone" type="tel" id="phone"
-              :class="{ 'error-border': errors.phone && formData.phone === '' }"
-              placeholder="Enter your phone (e.g., +1234567890)" @blur="validateField('phone')" @input="clearError('phone')" />
-            <p v-if="errors.phone" class="error-text">{{ errors.phone }}</p>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="address">Address</label>
-            <textarea v-model="formData.address" id="address"
-              :class="{ 'error-border': errors.address && formData.address === '' }"
-              placeholder="Enter your full address" @blur="validateField('address')" @input="clearError('address')"></textarea>
-            <p v-if="errors.address" class="error-text">{{ errors.address }}</p>
-          </div>
-          <div class="form-group" style="visibility: hidden;">
-            <label> </label>
-            <input disabled />
-            <p> </p>
-          </div>
-          <div class="form-group" style="visibility: hidden;">
-            <label> </label>
-            <input disabled />
-            <p> </p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input v-model="formData.password" type="password" id="password"
-            :class="{ 'error-border': errors.password && formData.password === '' }"
-            placeholder="Enter your password" @blur="validateField('password')" @input="clearError('password')" />
-          <p v-if="errors.password" class="error-text">{{ errors.password }}</p>
-        </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <input v-model="formData.confirmPassword" type="password" id="confirmPassword"
-            :class="{ 'error-border': errors.confirmPassword && formData.confirmPassword === '' }"
-            placeholder="Confirm your password" @blur="validateField('confirmPassword')" @input="clearError('confirmPassword')" />
-          <p v-if="errors.confirmPassword" class="error-text">{{ errors.confirmPassword }}</p>
-        </div>
+      <!-- Right Side: Form Card -->
+      <div class="form-section">
+        <div class="form-card">
+          <h2 class="form-title">Create Your Account</h2>
+          <form @submit.prevent="handleSubmit" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input 
+                  v-model="formData.firstName" 
+                  @blur="validateField('firstName')"
+                  @input="clearError('firstName')"
+                  type="text" 
+                  id="firstName" 
+                  placeholder="John"
+                  :class="{ 'error-input': errors.firstName }"
+                />
+                <span v-if="errors.firstName" class="error-message">{{ errors.firstName }}</span>
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input 
+                  v-model="formData.lastName" 
+                  @blur="validateField('lastName')"
+                  @input="clearError('lastName')"
+                  type="text" 
+                  id="lastName" 
+                  placeholder="Doe"
+                  :class="{ 'error-input': errors.lastName }"
+                />
+                <span v-if="errors.lastName" class="error-message">{{ errors.lastName }}</span>
+              </div>
+            </div>
 
-        <button type="submit" :disabled="isLoading">
-          {{ isLoading ? 'Registering...' : 'Create Account' }}
-        </button>
-        <p class="forget-password">
-          <a href="/forget-password" class="link">Forget Password?</a>
-        </p>
-      </form>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input 
+                v-model="formData.email" 
+                @blur="validateField('email')"
+                @input="clearError('email')"
+                type="email" 
+                id="email" 
+                placeholder="john.doe@example.com"
+                :class="{ 'error-input': errors.email }"
+              />
+              <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+            </div>
 
-      <p class="login-link">
-        Already have an account? <a href="/login" class="link">Sign In</a>
-      </p>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input 
+                  v-model="formData.phone" 
+                  @blur="validateField('phone')"
+                  @input="clearError('phone')"
+                  type="tel" 
+                  id="phone" 
+                  placeholder="+1 (555) 123-4567"
+                  :class="{ 'error-input': errors.phone }"
+                />
+                <span v-if="errors.phone" class="error-message">{{ errors.phone }}</span>
+              </div>
+              <div class="form-group">
+                <label for="address">Address</label>
+                <input 
+                  v-model="formData.address" 
+                  @blur="validateField('address')"
+                  @input="clearError('address')"
+                  type="text" 
+                  id="address" 
+                  placeholder="123 Main St"
+                  :class="{ 'error-input': errors.address }"
+                />
+                <span v-if="errors.address" class="error-message">{{ errors.address }}</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                  v-model="formData.password" 
+                  @blur="validateField('password')"
+                  @input="clearError('password')"
+                  type="password" 
+                  id="password" 
+                  placeholder="••••••••"
+                  :class="{ 'error-input': errors.password }"
+                />
+                <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
+              </div>
+              <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input 
+                  v-model="formData.confirmPassword" 
+                  @blur="validateField('confirmPassword')"
+                  @input="clearError('confirmPassword')"
+                  type="password" 
+                  id="confirmPassword" 
+                  placeholder="••••••••"
+                  :class="{ 'error-input': errors.confirmPassword }"
+                />
+                <span v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</span>
+              </div>
+            </div>
+
+            <button type="submit" :disabled="isLoading" class="sign-up-button">
+              <span v-if="isLoading">Registering...</span>
+              <span v-else>Create Account</span>
+            </button>
+            
+            <span style="color: black;">have an account?</span> <a href="/login" class="link">Sign In</a>
+
+            <div v-if="errors.server" class="server-error">
+              {{ errors.server }}
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -85,31 +151,60 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const formData = ref({
+  firstName: '',
+  lastName: '',
   email: '',
   password: '',
   confirmPassword: '',
-  displayName: '',
   phone: '',
   address: ''
 });
+
 const errors = ref({});
 const isLoading = ref(false);
 const router = useRouter();
 
 const FIELD_LIMITS = {
+  firstName: { min: 2, max: 50 },
+  lastName: { min: 2, max: 50 },
   email: { min: 5, max: 254 },
   password: { min: 8, max: 128 },
-  displayName: { min: 2, max: 50 },
   phone: { min: 10, max: 15 },
   address: { min: 5, max: 200 }
 };
 
 const clearError = (field) => {
-  errors.value[field] = '';
+  if (errors.value[field]) {
+    errors.value[field] = '';
+  }
 };
 
 const validateField = (field) => {
   const newErrors = { ...errors.value };
+
+  if (field === 'firstName') {
+    if (!formData.value.firstName?.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (formData.value.firstName.length < FIELD_LIMITS.firstName.min) {
+      newErrors.firstName = `First name must be at least ${FIELD_LIMITS.firstName.min} characters`;
+    } else if (formData.value.firstName.length > FIELD_LIMITS.firstName.max) {
+      newErrors.firstName = `First name cannot exceed ${FIELD_LIMITS.firstName.max} characters`;
+    } else {
+      delete newErrors.firstName;
+    }
+  }
+
+  if (field === 'lastName') {
+    if (!formData.value.lastName?.trim()) {
+      newErrors.lastName = 'Last name is required';
+    } else if (formData.value.lastName.length < FIELD_LIMITS.lastName.min) {
+      newErrors.lastName = `Last name must be at least ${FIELD_LIMITS.lastName.min} characters`;
+    } else if (formData.value.lastName.length > FIELD_LIMITS.lastName.max) {
+      newErrors.lastName = `Last name cannot exceed ${FIELD_LIMITS.lastName.max} characters`;
+    } else {
+      delete newErrors.lastName;
+    }
+  }
 
   if (field === 'email') {
     if (!formData.value.email) {
@@ -161,18 +256,6 @@ const validateField = (field) => {
     }
   }
 
-  if (field === 'displayName') {
-    if (!formData.value.displayName?.trim()) {
-      newErrors.displayName = 'Full name is required';
-    } else if (formData.value.displayName.length < FIELD_LIMITS.displayName.min) {
-      newErrors.displayName = `Name must be at least ${FIELD_LIMITS.displayName.min} characters`;
-    } else if (formData.value.displayName.length > FIELD_LIMITS.displayName.max) {
-      newErrors.displayName = `Name cannot exceed ${FIELD_LIMITS.displayName.max} characters`;
-    } else {
-      delete newErrors.displayName;
-    }
-  }
-
   if (field === 'address') {
     if (!formData.value.address?.trim()) {
       newErrors.address = 'Address is required';
@@ -189,7 +272,7 @@ const validateField = (field) => {
 };
 
 const validateForm = () => {
-  const fields = ['email', 'phone', 'password', 'confirmPassword', 'displayName', 'address'];
+  const fields = ['firstName', 'lastName', 'email', 'phone', 'password', 'confirmPassword', 'address'];
   fields.forEach(validateField);
   return Object.keys(errors.value).length === 0;
 };
@@ -206,9 +289,10 @@ const handleSubmit = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        firstName: formData.value.firstName,
+        lastName: formData.value.lastName,
         email: formData.value.email,
         password: formData.value.password,
-        displayName: formData.value.displayName,
         phone: formData.value.phone,
         address: formData.value.address
       })
@@ -232,153 +316,221 @@ const handleSubmit = async () => {
 </script>
 
 <style>
-/* Global CSS styles */
-* {
+/* Reset all margins and padding for the entire page */
+html, body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff !important;
+  overflow-x: hidden; /* Prevents horizontal scroll */
+}
+</style>
+
+<style scoped>
+/* Root container that covers the ENTIRE page */
+.registration-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ffffff;
+  overflow: auto;
 }
 
-body {
+/* Main content container */
+.registration-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
   background-color: #ffffff;
-  font-family: Arial, sans-serif;
 }
 
-.form-container {
+/* Welcome section (left side) */
+.welcome-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
   background-color: #ffffff;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-content {
+  max-width: 500px;
+  padding: 1.5rem;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.welcome-text {
+  color: #4a5568;
+  line-height: 1.6;
+  font-size: 1.0625rem;
+}
+
+.benefits-list {
+  margin: 1.25rem 0;
+  padding-left: 1.5rem;
+  list-style-type: none;
+}
+
+.benefits-list li {
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.benefits-list li:before {
+  content: "✓";
+  position: absolute;
+  left: -1.5rem;
+  color: #2b6cb0;
+  font-weight: bold;
+}
+
+.call-to-action {
+  font-weight: 600;
+  color: #2b6cb0;
+  margin-top: 1.5rem;
+}
+
+/* Form section (right side) */
+.form-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #ffffff;
+}
+
+.form-card {
   width: 100%;
   max-width: 500px;
-  text-align: center;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
 }
 
 .form-title {
-  font-size: 24px;
+  font-size: 1.75rem;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
   font-weight: 600;
-  color: #1a202c;
-  margin-bottom: 40px;
+  text-align: center;
 }
 
 .form-row {
   display: flex;
-  gap: 20px;
-  margin-bottom: 24px;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-group {
   flex: 1;
-  text-align: left;
+  margin-bottom: 0.5rem;
+  position: relative;
 }
 
 .form-group label {
   display: block;
-  font-size: 14px;
+  font-size: 0.875rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #2d3748;
-  margin-bottom: 8px;
 }
 
-.form-group input,
-.form-group textarea {
+.form-group input {
   width: 100%;
-  padding: 12px;
+  padding: 0.75rem 1rem;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 14px;
-  background-color: #f7f7f7;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  resize: vertical; /* Allows vertical resizing for textarea */
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  color: #1a202c;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
 }
 
-.form-group textarea {
-  min-height: 80px; /* Default size for textarea */
-}
-
-.form-group input.error-border,
-.form-group textarea.error-border {
+.form-group input.error-input {
   border-color: #e53e3e;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+.form-group input:focus {
   outline: none;
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
-}
-
-.form-group .error-text {
-  color: #e53e3e;
-  font-size: 12px;
-  margin-top: 4px;
-  text-align: left;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.16);
 }
 
 .error-message {
-  background-color: #fef2f2;
-  border-left: 4px solid #e53e3e;
-  color: #742a2a;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 32px;
-  text-align: left;
+  color: #e53e3e;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(to right, #3182ce, #63b3ed);
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 500;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.3s;
-  margin-top: 16px;
-}
-
-button:hover:not(:disabled) {
-  background: linear-gradient(to right, #2b6cb0, #4299e1);
-  transform: translateY(-2px);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.forget-password {
-  margin-top: 16px;
-  font-size: 14px;
-  color: #4a5568;
+.server-error {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin-top: 1rem;
   text-align: center;
 }
 
-.forget-password .link {
-  color: #3182ce;
-  text-decoration: none;
+.sign-up-button {
+  width: 100%;
+  padding: 0.875rem;
+  background-color: #2b6cb0;
+  color: #ffffff;
+  font-size: 1rem;
   font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
 }
 
-.forget-password .link:hover {
-  text-decoration: underline;
+.sign-up-button:hover:not(:disabled) {
+  background-color: #2c5282;
 }
 
-.login-link {
-  margin-top: 32px;
-  font-size: 14px;
-  color: #4a5568;
+.sign-up-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-.login-link .link {
-  color: #3182ce;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.login-link .link:hover {
-  text-decoration: underline;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .registration-container {
+    flex-direction: column;
+  }
+  
+  .welcome-section,
+  .form-section {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .welcome-content {
+    text-align: center;
+  }
+  
+  .benefits-list {
+    text-align: left;
+    display: inline-block;
+  }
 }
 </style>
