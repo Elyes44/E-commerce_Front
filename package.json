@@ -1,20 +1,33 @@
 {
-  "name": "my-vue-app",
+  "name": "vue-argon-design-system",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "npm run serve",
+    "serve": "vue-cli-service serve",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider cross-env CI=false vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@vueuse/core": "^13.4.0",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.1"
+    "axios": "^1.10.0",
+    "bootstrap-vue": "^2.0.4",
+    "flatpickr": "^4.5.1",
+    "nouislider": "^11.1.0",
+    "register-service-worker": "^1.5.2",
+    "vue": "^2.6.6",
+    "vue-flatpickr-component": "^8.1.1",
+    "vue-lazyload": "^1.2.6",
+    "vue-router": "^3.0.2",
+    "vue2-transitions": "^0.2.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.3",
-    "vite": "^6.3.5"
+    "@vue/cli-plugin-babel": "^3.4.0",
+    "@vue/cli-plugin-eslint": "^3.4.0",
+    "@vue/cli-plugin-pwa": "^3.4.0",
+    "@vue/cli-service": "^3.4.0",
+    "cross-env": "^7.0.3",
+    "node-sass": "^9.0.0",
+    "sass-loader": "10.5.2",
+    "vue-template-compiler": "^2.6.6"
   }
 }
