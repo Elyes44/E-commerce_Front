@@ -9,23 +9,11 @@
       <div class="row justify-content-center">
         <div class="col-lg-5">
           <card type="secondary" shadow header-classes="bg-white pb-5" body-classes="px-lg-5 py-lg-5" class="border-0">
-            <template>
-              <div class="text-muted text-center mb-3">
-                <small>Sign in with</small>
-              </div>
-              <div class="btn-wrapper text-center">
-                <base-button type="neutral">
-                  <img slot="icon" src="img/icons/common/124010.png"> Facebook
-                </base-button>
-                <base-button type="neutral">
-                  <img slot="icon" src="img/icons/common/google.svg"> Google
-                </base-button>
-              </div>
-            </template>
+
 
             <template>
               <div class="text-center text-muted mb-4">
-                <small>Or sign up with credentials</small>
+                <small> Good idea to join us !</small>
               </div>
 
               <form role="form" @submit.prevent="handleSubmit">
@@ -75,6 +63,7 @@
                   v-model="formData.password"
                   :class="{ 'is-invalid': errors.password }"
                 />
+
                 <p class="text-danger" v-if="errors.password">{{ errors.password }}</p>
 
                 <!-- Password Strength Checker -->
@@ -91,6 +80,7 @@
                   <p :class="{'text-success': passwordStrength.hasMinLength, 'text-danger': !passwordStrength.hasMinLength}">
                     {{ passwordStrength.hasMinLength ? '✓' : '✗' }} At least 6 characters
                   </p>
+                  
                 </div>
 
                 <base-checkbox v-model="formData.agreed">
