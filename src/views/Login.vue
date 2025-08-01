@@ -76,53 +76,170 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   data() {
     return {
       email: '',
-      password: ''
-    }
+      password: '',
+      refreshInterval: null,
+      axiosInterceptor: null
+    };
   },
   methods: {
     async handleEmailLogin() {
       try {
         const response = await axios.post(
           `${this.BASE_URL}/api/auth/login`,
-          {
-            email: this.email,
-            password: this.password
-          },
-          {
-            withCredentials: true
-          }
-        )
+          { email: this.email, password: this.password },
+          { withCredentials: true }
+        );
 
-        console.log('Login success:', response.data)
-        this.$router.push('/')
+        console.log('Login response:', response.data);
+
+        // Sauvegarder les données d'authentification
+        this.saveAuthData(response.data);
+
+        // Vérifier que le token est bien enregistré
+        const token = localStorage.getItem('accessToken');
+        this.$store.commit('setAuth', true);  // ← Mise à jour de l'état d'authentification
+        this.$router.push('/profile');        // ← Redirection vers le profil
+        if (!token) {
+          throw new Error('Token not saved properly');
+        }
+
+        // Configurer axios et les intercepteurs
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        this.setupAxiosInterceptor();
+        this.scheduleTokenRefresh();
+
+        // Rediriger vers profileUser
+        console.log('Redirecting to profile...');
+        await this.$router.push({ 
+          name: 'profileUser', 
+          params: { id: response.data.user.id },
+          query: { freshLogin: 'true' }
+        });
+
       } catch (err) {
-        console.error(
-          'Login failed:',
-          err.response && err.response.data ? err.response.data : err.message
-        )
-        alert(
-          'Login failed: ' +
-          (err.response && err.response.data && err.response.data.message
-            ? err.response.data.message
-            : 'Server error')
-        )
+        this.handleLoginError(err);
       }
+    },
+    async refreshToken() {
+  try {
+    const currentToken = localStorage.getItem('accessToken');
+    console.log('Attempting to refresh token...');
+    const response = await axios.post(
+      `${this.BASE_URL}/api/auth/refresh-token`,
+      {},
+      {
+        headers: { 'Authorization': `Bearer ${currentToken}` },
+        withCredentials: true
+      }
+    );
+
+    const newToken = response.data.token || response.data.accessToken;
+    if (!newToken) throw new Error('No new token received');
+
+    localStorage.setItem('accessToken', newToken);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    console.log('Token refreshed successfully');
+    return true;
+  } catch (err) {
+    // Replace optional chaining with explicit checks
+    const errorData = err.response && err.response.data ? err.response.data : err.message;
+    console.error('Refresh failed:', errorData);
+    this.clearAuthData();
+    this.$router.push('/login');
+    return false;
+  }
+},
+    setupAxiosInterceptor() {
+      if (this.axiosInterceptor !== null) {
+        axios.interceptors.response.eject(this.axiosInterceptor);
+      }
+
+      this.axiosInterceptor = axios.interceptors.response.use(
+        response => response,
+        async error => {
+          const originalRequest = error.config;
+          
+          if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            
+            const refreshed = await this.refreshToken();
+            if (refreshed) {
+              originalRequest.headers['Authorization'] = `Bearer ${localStorage.getItem('accessToken')}`;
+              return axios(originalRequest);
+            }
+          }
+          
+          return Promise.reject(error);
+        }
+      );
+    },
+    scheduleTokenRefresh() {
+      if (this.refreshInterval) clearInterval(this.refreshInterval);
+      
+      this.refreshInterval = setInterval(async () => {
+        console.log('Auto-refreshing token...');
+        await this.refreshToken();
+      }, 300000); // 5 minutes
+    },
+    saveAuthData(authData) {
+      if (!authData || !authData.token || !authData.user) {
+        console.error('Invalid auth data:', authData);
+        throw new Error('Invalid authentication data');
+      }
+
+      localStorage.setItem('accessToken', authData.token);
+      localStorage.setItem('user', JSON.stringify(authData.user));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${authData.token}`;
+      console.log('Auth data saved:', { 
+        token: authData.token, 
+        user: authData.user 
+      });
+    },
+    clearAuthData() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      delete axios.defaults.headers.common['Authorization'];
+      if (this.refreshInterval) clearInterval(this.refreshInterval);
+      if (this.axiosInterceptor !== null) {
+        axios.interceptors.response.eject(this.axiosInterceptor);
+      }
+    },
+    initializeAuth() {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        this.setupAxiosInterceptor();
+        this.scheduleTokenRefresh();
+      }
+    },
+    handleLoginError(err) {
+      const errorMsg = (err.response && err.response.data && err.response.data.message) 
+        || 'Server error';
+      console.error('Login failed:', errorMsg);
+      alert(`Login failed: ${errorMsg}`);
     }
   },
-computed: {
-  BASE_URL() {
-    return (this.$store && this.$store.state && this.$store.state.BASE_URL) || 
-           (window.BASE_URL) || 
-           'http://localhost:4000';
-  }
-}
-}
+  computed: {
+    BASE_URL() {
+      return (this.$store && this.$store.state && this.$store.state.BASE_URL) || 
+             window.BASE_URL || 
+             'http://localhost:4000';
+    }
+  },
+  created() {
+    this.initializeAuth();
+  },
+  // Supprimer beforeDestroy pour éviter de supprimer le token
+  // beforeDestroy() {
+  //   this.clearAuthData();
+  // }
+};
 </script>
 
 <style>

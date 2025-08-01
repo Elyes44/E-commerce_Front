@@ -7,10 +7,11 @@ import Landing from "./views/Landing.vue";
 import Login from "./views/Login.vue";
 import Register from "./views/Register.vue";
 import Profile from "./views/Profile.vue";
+import profileUser from "./views/profile-user.vue";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   linkExactActiveClass: "active",
   routes: [
     {
@@ -20,7 +21,8 @@ export default new Router({
         header: AppHeader,
         default: Components,
         footer: AppFooter
-      }
+      },
+      meta: { requiresAuth: false } // Pas besoin d'authentification
     },
     {
       path: "/landing",
@@ -29,7 +31,8 @@ export default new Router({
         header: AppHeader,
         default: Landing,
         footer: AppFooter
-      }
+      },
+      meta: { requiresAuth: false }
     },
     {
       path: "/login",
@@ -38,7 +41,8 @@ export default new Router({
         header: AppHeader,
         default: Login,
         footer: AppFooter
-      }
+      },
+      meta: { requiresAuth: false }
     },
     {
       path: "/register",
@@ -47,7 +51,8 @@ export default new Router({
         header: AppHeader,
         default: Register,
         footer: AppFooter
-      }
+      },
+      meta: { requiresAuth: false }
     },
     {
       path: "/profile",
@@ -56,7 +61,19 @@ export default new Router({
         header: AppHeader,
         default: Profile,
         footer: AppFooter
-      }
+      },
+      meta: { requiresAuth: true } // Nécessite une connexion
+    },
+    {
+      path: "/profileUser/:id",
+      name: "profileUser",
+      components: {
+        header: AppHeader,
+        default: profileUser,
+        footer: AppFooter
+      },
+      props: true,
+      meta: { requiresAuth: true } // Nécessite une connexion
     }
   ],
   scrollBehavior: to => {
@@ -67,3 +84,18 @@ export default new Router({
     }
   }
 });
+
+// Vérifie l'authentification avant chaque navigation
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('accessToken');
+  console.log('Navigating to:', to.path, 'isAuthenticated:', !!isAuthenticated);
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    console.log('Redirecting to /login because no token found');
+    next('/login');
+  } else {
+    next();
+  }
+});
+
+export default router;

@@ -20,10 +20,20 @@ import App from "./App.vue";
 import router from "./router";
 import Argon from "./plugins/argon-kit";
 import './registerServiceWorker'
+import axios from 'axios';
+import store from './store';
+
+
 
 Vue.config.productionTip = false;
+// Configurez axios
+axios.defaults.baseURL = 'http://localhost:4000' // ou votre URL de base
+axios.defaults.withCredentials = true
+// Stockez axios dans Vue prototype pour un accès global
+Vue.prototype.$axios = axios
 Vue.use(Argon);
 new Vue({
   router,
+  store, // Ajoutez le store ici
   render: h => h(App)
 }).$mount("#app");

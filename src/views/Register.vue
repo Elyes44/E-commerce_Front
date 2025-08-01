@@ -9,87 +9,111 @@
       <div class="row justify-content-center">
         <div class="col-lg-5">
           <card type="secondary" shadow header-classes="bg-white pb-5" body-classes="px-lg-5 py-lg-5" class="border-0">
-
-
             <template>
               <div class="text-center text-muted mb-4">
-                <small> Good idea to join us !</small>
+                <small>Good idea to join us! Step {{ step }} of 3</small>
               </div>
 
               <form role="form" @submit.prevent="handleSubmit">
-                <base-input
-                  alternative class="mb-3" placeholder="First Name"
-                  addon-left-icon="ni ni-single-02"
-                  v-model="formData.firstName"
-                  :class="{ 'is-invalid': errors.firstName }"
-                />
-                <p class="text-danger" v-if="errors.firstName">{{ errors.firstName }}</p>
-
-                <base-input
-                  alternative class="mb-3" placeholder="Last Name"
-                  addon-left-icon="ni ni-single-02"
-                  v-model="formData.lastName"
-                  :class="{ 'is-invalid': errors.lastName }"
-                />
-                <p class="text-danger" v-if="errors.lastName">{{ errors.lastName }}</p>
-
-                <div class="d-flex mb-3">
-                  <select v-model="formData.phoneCode" class="form-control w-25 me-2">
-                    <option value="+216">🇹🇳 +216</option>
-                    <option value="+33">🇫🇷 +33</option>
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+44">🇬🇧 +44</option>
-                  </select>
+                <!-- Step 1: First Name, Last Name, Phone Number -->
+                <div v-if="step === 1">
                   <base-input
-                    alternative placeholder="Phone Number"
-                    addon-left-icon="ni ni-mobile-button"
-                    v-model="formData.phoneNumber"
-                    :class="{ 'is-invalid': errors.phoneNumber }"
+                    alternative class="mb-3" placeholder="First Name"
+                    addon-left-icon="ni ni-single-02"
+                    v-model="formData.firstName"
+                    :class="{ 'is-invalid': errors.firstName }"
                   />
-                </div>
-                <p class="text-danger" v-if="errors.phoneNumber">{{ errors.phoneNumber }}</p>
+                  <p class="text-danger" v-if="errors.firstName">{{ errors.firstName }}</p>
 
-                <base-input
-                  alternative class="mb-3" placeholder="Email"
-                  addon-left-icon="ni ni-email-83"
-                  v-model="formData.email"
-                  :class="{ 'is-invalid': errors.email }"
-                />
-                <p class="text-danger" v-if="errors.email">{{ errors.email }}</p>
+                  <base-input
+                    alternative class="mb-3" placeholder="Last Name"
+                    addon-left-icon="ni ni-single-02"
+                    v-model="formData.lastName"
+                    :class="{ 'is-invalid': errors.lastName }"
+                  />
+                  <p class="text-danger" v-if="errors.lastName">{{ errors.lastName }}</p>
 
-                <base-input
-                  alternative type="password" placeholder="Password"
-                  addon-left-icon="ni ni-lock-circle-open"
-                  v-model="formData.password"
-                  :class="{ 'is-invalid': errors.password }"
-                />
-
-                <p class="text-danger" v-if="errors.password">{{ errors.password }}</p>
-
-                <!-- Password Strength Checker -->
-                <div class="password-checker mt-2">
-                  <p :class="{'text-success': passwordStrength.hasUppercase, 'text-danger': !passwordStrength.hasUppercase}">
-                    {{ passwordStrength.hasUppercase ? '✓' : '✗' }} Contains uppercase letter
-                  </p>
-                  <p :class="{'text-success': passwordStrength.hasNumber, 'text-danger': !passwordStrength.hasNumber}">
-                    {{ passwordStrength.hasNumber ? '✓' : '✗' }} Contains a number
-                  </p>
-                  <p :class="{'text-success': passwordStrength.hasSpecial, 'text-danger': !passwordStrength.hasSpecial}">
-                    {{ passwordStrength.hasSpecial ? '✓' : '✗' }} Contains a special character
-                  </p>
-                  <p :class="{'text-success': passwordStrength.hasMinLength, 'text-danger': !passwordStrength.hasMinLength}">
-                    {{ passwordStrength.hasMinLength ? '✓' : '✗' }} At least 6 characters
-                  </p>
-                  
+                  <div class="d-flex mb-3">
+                    <select v-model="formData.phoneCode" class="form-control w-25 me-2">
+                      <option value="+216">🇹🇳 +216</option>
+                      <option value="+33">🇫🇷 +33</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                    </select>
+                    <base-input
+                      alternative placeholder="Phone Number"
+                      addon-left-icon="ni ni-mobile-button"
+                      v-model="formData.phoneNumber"
+                      :class="{ 'is-invalid': errors.phoneNumber }"
+                    />
+                  </div>
+                  <p class="text-danger" v-if="errors.phoneNumber">{{ errors.phoneNumber }}</p>
                 </div>
 
-                <base-checkbox v-model="formData.agreed">
-                  <span>I agree with the <a href="#">Privacy Policy</a></span>
-                </base-checkbox>
-                <p class="text-danger" v-if="errors.agreed">{{ errors.agreed }}</p>
+                <!-- Step 2: Email, Password -->
+                <div v-if="step === 2">
+                  <base-input
+                    alternative class="mb-3" placeholder="Email"
+                    addon-left-icon="ni ni-email-83"
+                    v-model="formData.email"
+                    :class="{ 'is-invalid': errors.email }"
+                  />
+                  <p class="text-danger" v-if="errors.email">{{ errors.email }}</p>
 
+                  <base-input
+                    alternative type="password" placeholder="Password"
+                    addon-left-icon="ni ni-lock-circle-open"
+                    v-model="formData.password"
+                    :class="{ 'is-invalid': errors.password }"
+                  />
+                  <p class="text-danger" v-if="errors.password">{{ errors.password }}</p>
+
+                  <!-- Password Strength Checker -->
+                  <div class="password-checker mt-2">
+                    <p :class="{'text-success': passwordStrength.hasUppercase, 'text-danger': !passwordStrength.hasUppercase}">
+                      {{ passwordStrength.hasUppercase ? '✓' : '✗' }} Contains uppercase letter
+                    </p>
+                    <p :class="{'text-success': passwordStrength.hasNumber, 'text-danger': !passwordStrength.hasNumber}">
+                      {{ passwordStrength.hasNumber ? '✓' : '✗' }} Contains a number
+                    </p>
+                    <p :class="{'text-success': passwordStrength.hasSpecial, 'text-danger': !passwordStrength.hasSpecial}">
+                      {{ passwordStrength.hasSpecial ? '✓' : '✗' }} Contains a special character
+                    </p>
+                    <p :class="{'text-success': passwordStrength.hasMinLength, 'text-danger': !passwordStrength.hasMinLength}">
+                      {{ passwordStrength.hasMinLength ? '✓' : '✗' }} At least 6 characters
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Step 3: Role Selection, Privacy Policy -->
+                <div v-if="step === 3">
+                  <div class="mb-3">
+                    <label class="form-control-label">Are you a Client or Seller?</label>
+                    <select v-model="formData.role" class="form-control" :class="{ 'is-invalid': errors.role }">
+                      <option value="" disabled>Select your role</option>
+                      <option value="client">Customer</option>
+                      <option value="seller">Seller</option>
+                    </select>
+                  </div>
+                  <p class="text-danger" v-if="errors.role">{{ errors.role }}</p>
+
+                  <base-checkbox v-model="formData.agreed">
+                    <span>I agree with the <a href="#">Privacy Policy</a></span>
+                  </base-checkbox>
+                  <p class="text-danger" v-if="errors.agreed">{{ errors.agreed }}</p>
+                </div>
+
+                <!-- Navigation Buttons -->
                 <div class="text-center">
-                  <base-button type="primary" native-type="submit" class="my-4">Create account</base-button>
+                  <base-button v-if="step > 1" type="secondary" class="my-4 mr-2" @click="step--">
+                    Back
+                  </base-button>
+                  <base-button v-if="step < 3" type="primary" class="my-4" @click="nextStep">
+                    Next
+                  </base-button>
+                  <base-button v-if="step === 3" type="primary" native-type="submit" class="my-4">
+                    Create account
+                  </base-button>
                 </div>
               </form>
             </template>
@@ -114,14 +138,15 @@
 import { ref, watch } from 'vue'
 import axios from 'axios'
 
+const step = ref(1) // Track current step
 const formData = ref({
   firstName: '',
   lastName: '',
   phoneCode: '+216',
   phoneNumber: '',
-  address: '',
   email: '',
   password: '',
+  role: '', // Added role field
   agreed: false
 })
 
@@ -143,38 +168,49 @@ watch(() => formData.value.password, (pwd) => {
   passwordStrength.value.hasMinLength = pwd.length >= 6
 })
 
-const validateForm = () => {
+const validateStep = () => {
   errors.value = {}
 
-  if (formData.value.firstName.length < 3 || formData.value.firstName.length > 100)
-    errors.value.firstName = 'First name must be between 3 and 100 characters'
+  if (step.value === 1) {
+    if (formData.value.firstName.length < 3 || formData.value.firstName.length > 100)
+      errors.value.firstName = 'First name must be between 3 and 100 characters'
 
-  if (formData.value.lastName.length < 3 || formData.value.lastName.length > 100)
-    errors.value.lastName = 'Last name must be between 3 and 100 characters'
+    if (formData.value.lastName.length < 3 || formData.value.lastName.length > 100)
+      errors.value.lastName = 'Last name must be between 3 and 100 characters'
 
-  const phoneRegex = /^[0-9]{6,10}$/
-  if (!phoneRegex.test(formData.value.phoneNumber))
-    errors.value.phoneNumber = 'Phone number must be 6 to 10 digits'
+    const phoneRegex = /^[0-9]{6,10}$/
+    if (!phoneRegex.test(formData.value.phoneNumber))
+      errors.value.phoneNumber = 'Phone number must be 6 to 10 digits'
+  } else if (step.value === 2) {
+    if (!formData.value.email.includes('@'))
+      errors.value.email = 'Email must contain "@"'
 
-  if (!formData.value.email.includes('@'))
-    errors.value.email = 'Email must contain "@"'
+    const password = formData.value.password
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/
+    if (!passwordRegex.test(password))
+      errors.value.password = 'Password must have 1 uppercase, 1 number, 1 special character'
+  } else if (step.value === 3) {
+    if (!formData.value.role)
+      errors.value.role = 'Please select a role'
 
-  const password = formData.value.password
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/
-  if (!passwordRegex.test(password))
-    errors.value.password = 'Password must have 1 uppercase, 1 number, 1 special character'
-
-  if (!formData.value.agreed)
-    errors.value.agreed = 'You must agree to the Privacy Policy'
+    if (!formData.value.agreed)
+      errors.value.agreed = 'You must agree to the Privacy Policy'
+  }
 
   return Object.keys(errors.value).length === 0
 }
 
+const nextStep = () => {
+  if (validateStep()) {
+    step.value++
+  }
+}
+
 const handleSubmit = async () => {
-  if (!validateForm()) return
+  if (!validateStep()) return
 
   try {
-    await axios.post('http://localhost:4000/api/auth/register', {
+    await axios.post(`${this.BASE_URL}/api/auth/register`, {
       ...formData.value,
       phone: `${formData.value.phoneCode}${formData.value.phoneNumber}`
     })

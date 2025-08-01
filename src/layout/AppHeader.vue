@@ -53,9 +53,9 @@
                         <span class="nav-link-inner--text">Examples</span>
                     </a>
                     <router-link to="/landing" class="dropdown-item">Landing</router-link>
-                    <router-link to="/profile" class="dropdown-item">Profile</router-link>
-                    <router-link to="/login" class="dropdown-item">Login</router-link>
-                    <router-link to="/register" class="dropdown-item">Register</router-link>
+                    <router-link to="/profile" class="dropdown-item" v-if="isAuthenticated">Profile</router-link>
+                    <router-link to="/login" class="dropdown-item" v-if="!isAuthenticated">Login</router-link>
+                    <router-link to="/register" class="dropdown-item" v-if="!isAuthenticated">Register</router-link>
                 </base-dropdown>
             </ul>
             <ul class="navbar-nav align-items-lg-center ml-lg-auto">
@@ -87,31 +87,172 @@
                         <span class="nav-link-inner--text d-lg-none">Github</span>
                     </a>
                 </li>
-                <li class="nav-item d-none d-lg-block ml-lg-4">
-                    <a href="https://www.creative-tim.com/product/vue-argon-design-system" target="_blank" rel="noopener"
-                       class="btn btn-neutral btn-icon">
-                <span class="btn-inner--icon">
-                  <i class="fa fa-cloud-download mr-2"></i>
-                </span>
-                        <span class="nav-link-inner--text">Download</span>
-                    </a>
+                <li class="nav-item d-none d-lg-block ml-lg-4" v-if="isAuthenticated">
+                    <base-dropdown tag="li" class="nav-item">
+                        <a slot="title" class="nav-link" data-toggle="dropdown" role="button">
+                            <i class="ni ni-single-02"></i>
+                            <span class="nav-link-inner--text">Mon profil</span>
+                        </a>
+                        <router-link 
+                            to="/profile" 
+                            class="dropdown-item"
+                            v-if="userRole === 'seller'"
+                        >
+                            <i class="ni ni-shop"></i>
+                            <span>My Shop</span>
+                        </router-link>
+                        <router-link 
+                            to="/login" 
+                            class="dropdown-item" 
+                            @click.native="logout"
+                        >
+                            <i class="ni ni-user-run"></i>
+                            <span>Logout</span>
+                        </router-link>
+                    </base-dropdown>
+                </li>
+                <li class="nav-item d-none d-lg-block ml-lg-4" v-if="!isAuthenticated">
+                    <router-link to="/login" class="nav-link">
+                        Login
+                    </router-link>
+                </li>
+                <li class="nav-item d-none d-lg-block ml-lg-4" v-if="!isAuthenticated">
+                    <router-link to="/register" class="nav-link">
+                        Register
+                    </router-link>
                 </li>
             </ul>
         </base-nav>
     </header>
 </template>
+
 <script>
 import BaseNav from "@/components/BaseNav";
 import BaseDropdown from "@/components/BaseDropdown";
 import CloseButton from "@/components/CloseButton";
+import axios from 'axios';
 
 export default {
   components: {
     BaseNav,
     CloseButton,
     BaseDropdown
+  },
+  data() {
+    return {
+      userRole: null
+    };
+  },
+  computed: {
+    isAuthenticated() {
+      return this.$store ? this.$store.state.auth.isAuthenticated : !!localStorage.getItem('accessToken');
+    }
+  },
+  created() {
+    this.loadUserRole();
+  },
+  methods: {
+     async loadUserData() {
+      this.isLoading = true;
+      try {
+        // Option 1: Depuis le store Vuex
+        if (this.$store && this.$store.state.auth.user) {
+          this.userRole = this.$store.state.auth.user.role;
+          return;
+        }
+
+        // Option 2: Depuis localStorage
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          this.userRole = user.role;
+          return;
+        }
+
+        // Option 3: Requête API si nécessaire
+        if (this.isAuthenticated && !this.userRole) {
+          const response = await axios.get('http://localhost:4000/api/auth/me', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            }
+          });
+          this.userRole = response.data.role;
+          // Mettre à jour le store/localStorage si nécessaire
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    },
+    async logout() {
+      try {
+        const refreshToken = this.getCookie('refreshToken');
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!refreshToken || !accessToken) {
+          this.clearAuth();
+          return;
+        }
+
+        const response = await axios.post('http://localhost:4000/api/auth/logout', 
+          { refreshToken },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            }
+          }
+        );
+
+        if (response.status === 200) {
+          this.clearAuth();
+          this.$router.push('/login');
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+        this.clearAuth();
+        this.$router.push('/login');
+      }
+    },
+    clearAuth() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      document.cookie = 'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      if (this.$store) {
+        this.$store.commit('setAuth', false);
+        this.$store.commit('setUser', null);
+      }
+      this.userRole = null;
+    }
+  },
+watch: {
+    isAuthenticated(newVal) {
+      if (newVal) {
+        this.loadUserData();
+      } else {
+        this.userRole = null;
+      }
+    }
   }
 };
 </script>
+
 <style>
+.nav-link-icon {
+  margin-right: 5px;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+.dropdown-item i {
+  margin-right: 10px;
+}
 </style>
